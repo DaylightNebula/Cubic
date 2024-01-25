@@ -1,5 +1,6 @@
 package daylightnebula.cubic.fabric.screens
 
+import daylightnebula.cubic.fabric.utils.Files
 import daylightnebula.cubic.fabric.utils.GuiButton
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
@@ -15,7 +16,7 @@ class PickGameScreen(val previous: Screen): Screen(Component.literal("PickGame")
     override fun init() {
         // add list
         addRenderableWidget(
-            GameList(minecraft!!, width, height - 112, 48, 36)
+            GameList(minecraft!!, Files.instancesFolder, width, height - 112, 48, 36)
         )
 
         // create button
@@ -36,19 +37,26 @@ class PickGameScreen(val previous: Screen): Screen(Component.literal("PickGame")
 
 class GameList(
     minecraft: Minecraft,
+    instancesFolder: File,
     x: Int, y: Int,
     width: Int, height: Int
 ): ObjectSelectionList<GameList.Entry>(minecraft, x, y, width, height) {
     init {
-        repeat(100) { idx ->
-            addEntry(GameListEntry(minecraft, File("Test $idx")))
+        // for each instance in the instance folder, add an entry for that
+        instancesFolder.listFiles()?.forEach { file ->
+            addEntry(GameListEntry(minecraft, file))
         }
     }
 
+    abstract class Entry: AutoCloseable, ObjectSelectionList.Entry<Entry>() {
+        override fun close() {}
+    }
     data class GameListEntry(val minecraft: Minecraft, val file: File): Entry() {
-        private val playButton = GuiButton(minecraft, "Play", ChatFormatting.GREEN) { println("TODO play") }
+        // buttons
+        private val playButton = GuiButton(minecraft, "Play", ChatFormatting.GREEN) { minecraft.setScreen(LoadScreen(file)) }
         private val deleteButton = GuiButton(minecraft, "X", ChatFormatting.RED) { println("TODO delete") }
 
+        // render element
         override fun render(
             gui: GuiGraphics,
             idx: Int,
@@ -72,6 +80,7 @@ class GameList(
             deleteButton.render(gui, x + width - 30, (height - 20) / 2 + y, 20, 20, mouseX, mouseY)
         }
 
+        // attempt tp click buttons
         override fun mouseClicked(mx: Double, my: Double, i: Int): Boolean {
             playButton.attemptPress()
             deleteButton.attemptPress()
@@ -79,9 +88,5 @@ class GameList(
         }
 
         override fun getNarration(): Component = Component.literal("Game save")
-    }
-
-    abstract class Entry: AutoCloseable, ObjectSelectionList.Entry<Entry>() {
-        override fun close() {}
     }
 }
