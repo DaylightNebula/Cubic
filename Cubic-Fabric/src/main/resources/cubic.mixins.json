@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "daylightnebula.cubic.fabric.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [],
+  "client": [
+    "MenuButtonMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
