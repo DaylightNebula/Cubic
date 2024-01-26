@@ -6,6 +6,6 @@ pluginManagement {
     }
 }
 
-include("Cubic-Core")
-include("Cubic-Fabric")
-include("Cubic-Plugin")
+include(":Cubic-Core")
+include(":Cubic-Fabric")
+include(":Cubic-Plugin")

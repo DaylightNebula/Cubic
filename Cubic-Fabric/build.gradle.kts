@@ -10,6 +10,8 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":Cubic-Core"))
+
     minecraft("com.mojang:minecraft:1.20.4")
     mappings(loom.officialMojangMappings())
     modImplementation("net.fabricmc:fabric-loader:0.15.6")
@@ -18,6 +20,6 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:0.95.1+1.20.4")
 }
 
-kotlin {
-    jvmToolchain(17)
-}
+//kotlin {
+//    jvmToolchain(17)
+//}
