@@ -15,11 +15,13 @@ class LoadScreen(val file: File): Screen(Component.literal("Load")) {
     override fun init() {
         super.init()
         CubicLoader.loadInto(minecraft!!, file).whenComplete { result, _ ->
+            val port = result.getOrNull() ?: return@whenComplete
+
             minecraft?.execute {
                 ConnectScreen.startConnecting(
                     this,
                     minecraft!!,
-                    ServerAddress.parseString("localhost"),
+                    ServerAddress.parseString("localhost:$port"),
                     ServerData("Cubic Server", "Cubic server.", ServerData.Type.OTHER),
                     false
                 )
