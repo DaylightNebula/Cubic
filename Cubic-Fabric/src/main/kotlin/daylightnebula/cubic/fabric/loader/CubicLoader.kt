@@ -1,12 +1,11 @@
 package daylightnebula.cubic.fabric.loader
 
-import kotlinx.coroutines.Job
+import daylightnebula.cubic.core.getEmptyPort
+import daylightnebula.cubic.fabric.FabricCommunicator
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.screens.TitleScreen
 import java.io.File
 import java.lang.Thread.sleep
 import java.util.concurrent.CompletableFuture
-import javax.swing.text.html.HTML.Tag.P
 import kotlin.concurrent.thread
 
 object CubicLoader {
@@ -25,15 +24,12 @@ object CubicLoader {
         // start server using properties start command
         val command = properties["start"] ?: return CompletableFuture.completedFuture(false)
         val thread = thread {
-            ProcessBuilder(command.split(" "))
+            ProcessBuilder(command.replace("{}", "-Dsingleplayer=${FabricCommunicator.port}").split(" "))
                 .directory(folder)
                 .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                 .redirectError(ProcessBuilder.Redirect.INHERIT)
                 .start()
         }
-
-        // add shutdown hook
-        Runtime.getRuntime().addShutdownHook(thread(start = false) { thread.join(100) })
 
         return CompletableFuture.supplyAsync {
             sleep(10000)

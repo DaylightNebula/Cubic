@@ -12,25 +12,31 @@ import io.ktor.server.plugins.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import java.net.ServerSocket
 import java.util.concurrent.CompletableFuture
+import kotlin.properties.Delegates
 
 abstract class Communicator {
 
+    val json = Json {
+        ignoreUnknownKeys = true
+    }
+
     private lateinit var server: NettyApplicationEngine
-    val port get() = server.environment.config.port
+    var port by Delegates.notNull<Int>()
+        private set
 
     // abstracts
     abstract val metadata: CubicServerMetadata?
     abstract fun receivedReady(address: String, metadata: CubicServerMetadata)
 
     // start the server when required
-    fun start() {
-        server = embeddedServer(Netty, module = module)
+    fun start(port: Int) {
+        this.port = port
+        server = embeddedServer(Netty, module = module, port = port)
         server.start(wait = false)
         println("Created Communicator on port $port!")
     }
@@ -46,7 +52,7 @@ abstract class Communicator {
         routing {
             // if metadata requests, return the given metadata
             get("/metadata") {
-                val response = metadata?.let { Json.encodeToString(it) } ?: "{}"
+                val response = metadata?.let { json.encodeToString(it) } ?: "{}"
                 this.call.respondText(response)
             }
 
@@ -54,18 +60,18 @@ abstract class Communicator {
             get("/ping") {
                 // decode ping request
                 val requestString = this.call.request.queryParameters["request"] ?: "{\"time\":${System.currentTimeMillis()}}"
-                val request = Json.decodeFromString<PingRequest>(requestString)
+                val request = json.decodeFromString<PingRequest>(requestString)
 
                 // respond
                 val response = PingResponse(request.time, System.currentTimeMillis())
-                this.call.respondText(Json.encodeToString(response))
+                this.call.respondText(json.encodeToString(response))
             }
 
             // handle ready requests
             get("/ready") {
                 // decode request
                 val requestString = this.call.request.queryParameters["request"] ?: "{\"time\":${System.currentTimeMillis()}}"
-                val request = Json.decodeFromString<CubicServerMetadata>(requestString)
+                val request = json.decodeFromString<CubicServerMetadata>(requestString)
 
                 // call ready function
                 receivedReady(this.call.request.origin.remoteAddress, request)
@@ -80,9 +86,9 @@ abstract class Communicator {
     fun requestMetadata(address: String) =
         request<CubicServerMetadata>(address, "metadata", "{}")
     fun ping(address: String) =
-        request<PingResponse>(address, "ping", Json.encodeToString(PingRequest(System.currentTimeMillis())))
+        request<PingResponse>(address, "ping", json.encodeToString(PingRequest(System.currentTimeMillis())))
     fun ready(address: String) =
-        request<JsonObject>(address, "ready", metadata?.let { Json.encodeToString(it) } ?: "{}")
+        request<JsonObject>(address, "ready", metadata?.let { json.encodeToString(it) } ?: "{}")
 
     // make a request
     inline fun <reified T: Any> request(
@@ -93,7 +99,7 @@ abstract class Communicator {
         runBlocking {
             // attempt to send request
             val response = try {
-                client.get("$address/$path", block = {
+                client.get("http://$address/$path", block = {
                     parameter("request", request)
                 })
             } catch (ex: Exception) {
@@ -102,7 +108,7 @@ abstract class Communicator {
 
             // read response
             val result: T =
-                try { Json.decodeFromString(response.bodyAsText()) }
+                try { json.decodeFromString(response.bodyAsText()) }
                 catch (ex: Exception) { return@runBlocking Result.failure(ex) }
 
             // return success
@@ -118,4 +124,11 @@ abstract class Communicator {
             }
         }
     }
+}
+
+fun getEmptyPort(): Int {
+    val socket = ServerSocket(0)
+    val port = socket.localPort
+    socket.close()
+    return port
 }

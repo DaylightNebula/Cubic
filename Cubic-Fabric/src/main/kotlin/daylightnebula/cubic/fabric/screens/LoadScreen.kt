@@ -15,8 +15,6 @@ class LoadScreen(val file: File): Screen(Component.literal("Load")) {
     override fun init() {
         super.init()
         CubicLoader.loadInto(minecraft!!, file).whenComplete { result, _ ->
-            println("Started with result $result")
-
             minecraft?.execute {
                 ConnectScreen.startConnecting(
                     this,
