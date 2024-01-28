@@ -35,7 +35,7 @@ fun WidgetUser.list(
 // create list function with a render callback
 fun <D: Any> WidgetUser.renderList(
     minecraft: Minecraft,
-    entries: List<D>,
+    datas: List<D>,
     width: Int, height: Int,
     top: Int, bottom: Int,
     xOffset: Int? = null,
@@ -43,8 +43,15 @@ fun <D: Any> WidgetUser.renderList(
     callback: (context: RenderContext, data: D) -> Unit
 ) {
     val element = this.addWidget(object: ObjectSelectionList<ListEntry>(minecraft, width, height, top, bottom), WidgetElement {
+        val entries = datas.map { ListCallbackEntry(minecraft, it, callback) }
+
         init {
-            entries.map { ListCallbackEntry(minecraft, it, callback) }.forEach(this::addEntry)
+            entries.forEach(this::addEntry)
+        }
+
+        override fun mouseClicked(d: Double, e: Double, i: Int): Boolean {
+            entries.forEach { it.clicked = true }
+            return super<ObjectSelectionList>.mouseClicked(d, e, i)
         }
     })
 
@@ -58,7 +65,7 @@ class ListCallbackEntry<D: Any>(
     private val data: D,
     val callback: (context: RenderContext, data: D) -> Unit
 ): ListEntry() {
-    private var clicked = false
+    var clicked = false
 
     override fun render(
         gui: GuiGraphics,
@@ -74,11 +81,6 @@ class ListCallbackEntry<D: Any>(
     ) {
         callback(RenderContext(minecraft, gui, x, y, width, height, mouseX, mouseY, hovered, clicked, tickDelta), data)
         clicked = false
-    }
-
-    override fun mouseClicked(d: Double, e: Double, i: Int): Boolean {
-        clicked = true
-        return super.mouseClicked(d, e, i)
     }
 
     override fun getNarration(): Component = Component.literal("List callback entry")

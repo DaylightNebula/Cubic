@@ -8,13 +8,12 @@ import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.components.ObjectSelectionList
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.gui.screens.TitleScreen
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
 import java.io.File
 
-class PickGameScreen(
-    private val previous: Screen
-): Screen(Component.literal("PickGame")) {
+class PickGameScreen: Screen(Component.literal("PickGame")) {
     override fun init() {
         // add list
         addRenderableWidget(
@@ -23,14 +22,14 @@ class PickGameScreen(
 
         // create button
         addRenderableWidget(
-            Button.builder(Component.literal("Create")) { minecraft?.setScreen(previous) }
+            Button.builder(Component.literal("Create")) { minecraft?.setScreen(TitleScreen(false)) }
                 .bounds(width / 2 - 100, height - 28, 148, 20)
                 .build()
         )
 
         // back button
         addRenderableWidget(
-            Button.builder(CommonComponents.GUI_BACK) { minecraft?.setScreen(previous) }
+            Button.builder(CommonComponents.GUI_BACK) { minecraft?.setScreen(TitleScreen(false)) }
                 .bounds(width / 2 + 50, height - 28, 50, 20)
                 .build()
         )

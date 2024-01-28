@@ -14,12 +14,8 @@ dependencies {
 
     minecraft("com.mojang:minecraft:1.20.4")
     mappings(loom.officialMojangMappings())
-    modImplementation("net.fabricmc:fabric-loader:0.15.6")
 
+    modImplementation("net.fabricmc:fabric-loader:0.15.6")
     modImplementation("net.fabricmc:fabric-language-kotlin:1.10.17+kotlin.1.9.22")
     modImplementation("net.fabricmc.fabric-api:fabric-api:0.95.1+1.20.4")
 }
-
-//kotlin {
-//    jvmToolchain(17)
-//}

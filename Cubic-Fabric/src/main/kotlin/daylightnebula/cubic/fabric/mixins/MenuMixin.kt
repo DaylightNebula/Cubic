@@ -38,7 +38,7 @@ class MenuMixin: Screen(Component.literal("Connect Button")) {
 
         // create and add button
         addRenderableWidget(
-            Button.builder(Component.literal("Games")) { minecraft?.setScreen(SelectGameScreen(this)) }
+            Button.builder(Component.literal("Games")) { minecraft?.setScreen(SelectGameScreen()) }
                 .bounds(this.width / 2 + 2, a, 98, 20)
                 .build()
         )
