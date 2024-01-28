@@ -2,6 +2,7 @@ package daylightnebula.cubic.fabric.mixins
 
 import com.mojang.realmsclient.RealmsMainScreen
 import daylightnebula.cubic.fabric.screens.PickGameScreen
+import daylightnebula.cubic.fabric.screens.SelectGameScreen
 import net.minecraft.client.gui.components.Button
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.TitleScreen
@@ -37,7 +38,7 @@ class MenuMixin: Screen(Component.literal("Connect Button")) {
 
         // create and add button
         addRenderableWidget(
-            Button.builder(Component.literal("Games")) { minecraft?.setScreen(PickGameScreen(this)) }
+            Button.builder(Component.literal("Games")) { minecraft?.setScreen(SelectGameScreen(this)) }
                 .bounds(this.width / 2 + 2, a, 98, 20)
                 .build()
         )

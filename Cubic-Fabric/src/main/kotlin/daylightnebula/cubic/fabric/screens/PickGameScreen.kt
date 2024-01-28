@@ -12,7 +12,9 @@ import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
 import java.io.File
 
-class PickGameScreen(val previous: Screen): Screen(Component.literal("PickGame")) {
+class PickGameScreen(
+    private val previous: Screen
+): Screen(Component.literal("PickGame")) {
     override fun init() {
         // add list
         addRenderableWidget(
