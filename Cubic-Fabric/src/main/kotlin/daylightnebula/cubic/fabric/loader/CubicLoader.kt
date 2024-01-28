@@ -2,6 +2,7 @@ package daylightnebula.cubic.fabric.loader
 
 import daylightnebula.cubic.core.getEmptyPort
 import daylightnebula.cubic.fabric.FabricCommunicator
+import daylightnebula.cubic.fabric.FabricCommunicator.port
 import net.minecraft.client.Minecraft
 import java.io.File
 import java.lang.Thread.sleep
@@ -20,11 +21,15 @@ object CubicLoader {
             tokens.first() to tokens.last()
         }.toMap()
 
+        // generate command
+        var command = properties["start"] ?: return CompletableFuture.completedFuture(Result.failure(IllegalStateException("No start command")))
+        if (command.startsWith("java ")) command = command.replace("java ", "java -Dsingleplayer=${FabricCommunicator.port} ")
+        else command += " --singleplayer ${FabricCommunicator.port}"
+
         println("Starting...")
         // start server using properties start command
-        val command = properties["start"] ?: return CompletableFuture.completedFuture(Result.failure(IllegalStateException("No start command")))
         val thread = thread {
-            ProcessBuilder(command.replace("{}", "-Dsingleplayer=${FabricCommunicator.port}").split(" "))
+            ProcessBuilder(command.split(" "))
                 .directory(folder)
                 .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                 .redirectError(ProcessBuilder.Redirect.INHERIT)
