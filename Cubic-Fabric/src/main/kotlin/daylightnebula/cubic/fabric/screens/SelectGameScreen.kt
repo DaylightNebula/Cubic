@@ -1,11 +1,11 @@
 package daylightnebula.cubic.fabric.screens
 
-import daylightnebula.cubic.fabric.utils.WidgetElement
-import daylightnebula.cubic.fabric.utils.WidgetUser
+import daylightnebula.cubic.fabric.utils.*
 import daylightnebula.cubic.fabric.utils.list
 import net.minecraft.ChatFormatting
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
+import java.io.File
 
 class SelectGameScreen(
     private val previous: Screen
@@ -13,16 +13,29 @@ class SelectGameScreen(
     override fun <T : WidgetElement> addWidget(widget: T): T = addRenderableWidget(widget)
 
     override fun init() {
-        list(minecraft!!, listOf("Test"), 200, height - 83, 32, 36, width / 2 - 4 - 200) { context, data ->
-            context.gui.drawString(
-                context.minecraft.font,
-                Component.literal(data).withStyle(ChatFormatting.WHITE),
-                context.x + context.width / 2, context.y,
-                567456
-            )
+        renderList(
+            minecraft!!,
+            Files.instancesFolder.listFiles()?.toList() ?: emptyList<File>(),
+            200, height - 83,
+            32, 36,
+            xOffset = width / 2 - 4 - 200
+        ) { context, file ->
+            context.text(file.name, ChatFormatting.WHITE, 10, 0, 40, 20)
+            context.button(
+                "Play", ChatFormatting.GREEN,
+                context.x + context.width - 82, 0,
+                40, 20
+            ) { minecraft?.setScreen(LoadScreen(file)) }
+            context.button(
+                "X", ChatFormatting.RED,
+                context.x + context.width - 38, 0,
+                20, 20
+            ) {
+                println("TODO Delete")
+            }
         }
 
-        list(minecraft!!, listOf("TestGame"), 200, height - 83, 32, 36, width / 2 + 4) { context, data ->
+        renderList(minecraft!!, listOf("TestGame"), 200, height - 83, 32, 36, width / 2 + 4) { context, data ->
             context.gui.drawString(
                 context.minecraft.font,
                 Component.literal(data).withStyle(ChatFormatting.WHITE),

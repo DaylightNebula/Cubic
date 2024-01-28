@@ -33,7 +33,7 @@ fun WidgetUser.list(
 }
 
 // create list function with a render callback
-fun <D: Any> WidgetUser.list(
+fun <D: Any> WidgetUser.renderList(
     minecraft: Minecraft,
     entries: List<D>,
     width: Int, height: Int,
@@ -51,16 +51,6 @@ fun <D: Any> WidgetUser.list(
     xOffset?.let { element.x = it }
     yOffset?.let { element.y = it }
 }
-
-// context to contain variables provided by Minecraft for rendering
-data class RenderContext(
-    val minecraft: Minecraft, val gui: GuiGraphics,
-    val x: Int, val y: Int,
-    val width: Int, val height: Int,
-    val mouseX: Int, val mouseY: Int,
-    val hovered: Boolean, val clicked: Boolean,
-    val delta: Float
-)
 
 // ListEntry that contains data, minecraft instance and callback for rendering
 class ListCallbackEntry<D: Any>(
@@ -82,7 +72,7 @@ class ListCallbackEntry<D: Any>(
         hovered: Boolean,
         tickDelta: Float
     ) {
-        callback(RenderContext(minecraft, gui, x, y, width, height, mouseX, mouseY, hovered, false, tickDelta), data)
+        callback(RenderContext(minecraft, gui, x, y, width, height, mouseX, mouseY, hovered, clicked, tickDelta), data)
         clicked = false
     }
 
