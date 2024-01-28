@@ -14,12 +14,11 @@ This can also be used with systems like [Meld](https://github.com/DaylightNebula
 
 | Platform | Support Status |
 |----------|----------------|
-| Vanilla  | In Progress    |
-| Paper    | In Progress    |
+| Paper    | Complete       |
 | Valence  | Planned        |
 | Meld     | Planned        |
 | Sponge   | Planned        |
 
-## Future Posibilities
+## Future Possibilities
 ### Custom Resource API
 Create libraries for all supported server platforms (expect maybe for Vanilla) that allow for custom models to be loaded and animated.  We could load from BBModel files or Minecraft model files and create the resources needed to use those models in game.  These custom models would be useful for creating custom blocks, items, and entities.
